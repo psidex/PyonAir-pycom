@@ -1,55 +1,56 @@
-#!/usr/bin/env python
-import pycom
-from helper import blink_led
-
-#Disable default wifi
+from machine import SD, Pin, reset, Timer, RTC, unique_id
 from network import WLAN
+import pycom
+
+from helper import blink_led
+import strings as s
+
+print("In startup")
+
+# Disable default wifi
 wlan = WLAN()
 wlan.deinit()
 
-pycom.heartbeat(False)  # disable the heartbeat LED
-pycom.rgbled(0x552000)  # flash orange to indicate startup
+# Disable the heartbeat LED and set to orange to indicate startup
+pycom.heartbeat(False)
+pycom.rgbled(0x552000)
 
 # Try to mount SD card, if this fails, keep blinking red and do not proceed
 try:
-    from machine import SD, Pin, reset
     import os
     import time
     from loggingpycom import DEBUG
     from LoggerFactory import LoggerFactory
-    from UserButton import UserButton
-    # Initialise LoggerFactory and status logger
+    from userbutton import UserButton
+
+    os.mount(SD(), "/sd")
+    
     logger_factory = LoggerFactory()
-    status_logger = logger_factory.create_status_logger('status_logger', level=DEBUG, terminal_out=True,
-                                                        filename='status_log.txt')
+    status_logger = logger_factory.create_status_logger(
+        "status_logger", level=DEBUG, terminal_out=True, filename="status_log.txt"
+    )
 
     # Initialise button interrupt on pin 14 for user interaction
     user_button = UserButton(status_logger)
     pin_14 = Pin("P14", mode=Pin.IN, pull=Pin.PULL_DOWN)
     pin_14.callback(Pin.IRQ_RISING | Pin.IRQ_FALLING, user_button.button_handler)
 
-    # Mount SD card
-    sd = SD()
-    os.mount(sd, '/sd')
-
 except Exception as e:
-    print(str(e))    
+    # If something goes wrong, blink red LED and reboot after 60 seconds
+    print("Startup failed:", str(e))
     reboot_counter = 0
     while True:
-        blink_led((0x550000, 0.5, True))  # blink red LED
-        time.sleep(0.5)
+        blink_led((0x550000, 0.5, True))
         reboot_counter += 1
         if reboot_counter >= 180:
             reset()
 
 try:
-    from machine import RTC, unique_id
     from initialisation import initialise_time
     from ubinascii import hexlify
     from Configuration import config
-    from config.setup import setup_new_config
+    from setup import setup_new_config
     from software_update import software_update
-    import strings as s
     import ujson
 
     # Read configuration file to get preferences
@@ -66,11 +67,15 @@ try:
     config.save_config({"fmt_version": 1})
 
     # Override Preferences - DEVELOPER USE ONLY - keep all overwrites here
-    if 'debug_config.json' in os.listdir('/flash'):
-        status_logger.warning("Overriding configuration with the content of debug_config.json")
-        with open('/flash/debug_config.json', 'r') as f:
+    if "debug_config.json" in os.listdir("/flash"):
+        status_logger.warning(
+            "Overriding configuration with the content of debug_config.json"
+        )
+        with open("/flash/debug_config.json", "r") as f:
             config.set_config(ujson.loads(f.read()))
-            status_logger.warning("Configuration changed to: " + str(config.get_config()))
+            status_logger.warning(
+                "Configuration changed to: " + str(config.get_config())
+            )
 
     # Check if GPS is enabled in configurations
     gps_on = True
@@ -83,10 +88,13 @@ try:
 
     # Check if device is configured, or SD card has been moved to another device
     device_id = hexlify(unique_id()).upper().decode("utf-8")
-    if not config.is_complete(status_logger) or config.get_config("device_id") != device_id:
+    if (
+        not config.is_complete(status_logger)
+        or config.get_config("device_id") != device_id
+    ):
         config.reset_configuration(status_logger)
         #  Force user to configure device, then reboot
-        setup_new_config(status_logger, arg=0)
+        setup_new_config(status_logger)
 
     # User button will enter configurations page from this point on
     user_button.set_config_enabled(True)
@@ -110,7 +118,7 @@ except Exception as e:
             if reboot_counter >= 180:
                 status_logger.info("rebooting...")
                 reset()
-        setup_new_config(status_logger, arg=0)
+        setup_new_config(status_logger)
     except Exception:
         reset()
 
@@ -118,7 +126,6 @@ pycom.rgbled(0x552000)  # flash orange until its loaded
 
 # If sd, time, logger and configurations were set, continue with initialisation
 try:
-    from machine import Timer
     from SensorLogger import SensorLogger
     from EventScheduler import EventScheduler
     from helper import blink_led, get_sensors, led_lock
@@ -126,14 +133,19 @@ try:
     from TempSHT35 import TempSHT35
     import GpsSIM28
     import _thread
-    from initialisation import initialise_pm_sensor, initialise_file_system, remove_residual_files, get_logging_level
+    from initialisation import (
+        initialise_pm_sensor,
+        initialise_file_system,
+        remove_residual_files,
+        get_logging_level,
+    )
     from LoRaWAN import LoRaWAN
 
     # Configurations are entered parallel to main execution upon button press for 2.5 secs
     user_button.set_config_blocking(False)
 
     # Set debug level - has to be set after logger was initialised and device was configured
-    logger_factory.set_level('status_logger', get_logging_level())
+    logger_factory.set_level("status_logger", get_logging_level())
 
     # Initialise file system
     initialise_file_system()
@@ -157,16 +169,26 @@ try:
     status_logger.info("Temperature and humidity sensor initialised")
 
     # Initialise PM power circuitry
-    PM_transistor = Pin('P20', mode=Pin.OUT)
+    PM_transistor = Pin("P20", mode=Pin.OUT)
     PM_transistor.value(0)
     if config.get_config(s.PM1) != "OFF" or config.get_config(s.PM2) != "OFF":
         PM_transistor.value(1)
 
     # Initialise PM sensor threads
     if sensors[s.PM1]:
-        initialise_pm_sensor(sensor_name=s.PM1, pins=('P3', 'P17'), serial_id=1, status_logger=status_logger)
+        initialise_pm_sensor(
+            sensor_name=s.PM1,
+            pins=("P3", "P17"),
+            serial_id=1,
+            status_logger=status_logger,
+        )
     if sensors[s.PM2]:
-        initialise_pm_sensor(sensor_name=s.PM2, pins=('P11', 'P18'), serial_id=2, status_logger=status_logger)
+        initialise_pm_sensor(
+            sensor_name=s.PM2,
+            pins=("P11", "P18"),
+            serial_id=2,
+            status_logger=status_logger,
+        )
 
     # Start scheduling lora messages if any of the sensors are defined
     if True in sensors.values():

@@ -13,11 +13,10 @@ from RtcDS1307 import clock
 from .html import get_html_form
 
 
-def setup_new_config(logger, arg):
+def setup_new_config(logger):
     """
-    Method that turns the pycom to an access point for the user to connect and update the configurations.
+    Start a WiFi AP that provides a configuration page.
     The device automatically reboots and applies modifications upon successful configuration.
-    Takes an extra dummy argument required by the threading library.
     :param logger: status logger
     :type logger: LoggerFactory
     """
