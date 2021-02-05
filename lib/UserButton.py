@@ -1,5 +1,5 @@
 from machine import Timer, reset
-from new_config import new_config
+from config.setup import setup_new_config
 from helper import led_lock
 import _thread
 
@@ -58,7 +58,7 @@ class UserButton:
         if not self.config_blocking:  # Configurations are entered parallel to main execution
             if led_lock.locked():
                 led_lock.release() #was not checked before -- runtiem error SJJ
-            _thread.start_new_thread(new_config, (self.logger, arg))
+            _thread.start_new_thread(setup_new_config, (self.logger, arg))
 
     # if the device is in configuration mode, it does not reboot automatically when exception is caught
     def get_reboot(self):

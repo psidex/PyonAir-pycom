@@ -47,7 +47,7 @@ try:
     from initialisation import initialise_time
     from ubinascii import hexlify
     from Configuration import config
-    from new_config import new_config
+    from config.setup import setup_new_config
     from software_update import software_update
     import strings as s
     import ujson
@@ -86,7 +86,7 @@ try:
     if not config.is_complete(status_logger) or config.get_config("device_id") != device_id:
         config.reset_configuration(status_logger)
         #  Force user to configure device, then reboot
-        new_config(status_logger, arg=0)
+        setup_new_config(status_logger, arg=0)
 
     # User button will enter configurations page from this point on
     user_button.set_config_enabled(True)
@@ -110,7 +110,7 @@ except Exception as e:
             if reboot_counter >= 180:
                 status_logger.info("rebooting...")
                 reset()
-        new_config(status_logger, arg=0)
+        setup_new_config(status_logger, arg=0)
     except Exception:
         reset()
 

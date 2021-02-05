@@ -16,7 +16,6 @@ class ConfigurationException(Exception):
 class Configuration:
 
     def __init__(self):
-
         self.configuration = {}
         self.default_configuration = s.default_configuration
 
