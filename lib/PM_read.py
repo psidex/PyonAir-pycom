@@ -49,16 +49,14 @@ def pm_thread(sensor_name, status_logger, pins, serial_id):
     elif sensor_type == "SPS030":
 
         # initialise sensor
-        while True:
-            try:
-                sensor = Sensirion(retries=1, pins=pins, id=serial_id)  # automatically starts measurement
-                break
-            except SensirionException as e:
-                status_logger.exception("Failed to read from sensor SPS030")
-                blink_led((0x550000, 0.4, True))
-                time.sleep(1)
+        try:
+            sensor = Sensirion(retries=1, pins=pins, id=serial_id)  # automatically starts measurement
+        except SensirionException as e:
+            status_logger.exception("Failed to read from sensor SPS030")
+            blink_led((0x550000, 0.4, True))
+            time.sleep(1)
 
-        # warm up time  - readings are not logged
+        # warm up time - readings are not logged
         while init_count < init_time:
             try:
                 time.sleep(1)

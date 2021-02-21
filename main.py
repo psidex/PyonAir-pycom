@@ -202,7 +202,8 @@ try:
     for val in range(3):
         blink_led((0x005500, 0.5, True))
         time.sleep(0.5)
-    # Initialise custom yellow heartbeat that triggers every 5 seconds
+
+    # Heartbeat blink that triggers every 5 seconds
     heartbeat = Timer.Alarm(blink_led, s=5, arg=(0x005500, 0.1, True), periodic=True)
 
     # Try to update RTC module with accurate UTC datetime if GPS is enabled and has not yet synchronized
@@ -211,7 +212,7 @@ try:
         _thread.start_new_thread(GpsSIM28.get_time, (rtc, status_logger))
 
 except Exception as e:
-    status_logger.exception("Exception in the main")
+    status_logger.exception("Exception in main")
     led_lock.acquire()
     pycom.rgbled(0x550000)
     while True:
