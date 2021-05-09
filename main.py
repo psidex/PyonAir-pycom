@@ -163,7 +163,7 @@ try:
 
     # Initialise temperature and humidity sensor thread with id: TEMP
     if sensors[s.TEMP]:
-        TEMP_logger = SensorLogger(sensor_name=s.TEMP, terminal_out=True)
+        TEMP_logger = SensorLogger(sensor_name=s.TEMP, sensor_type=config.get_config(s.TEMP), terminal_out=True)
         if config.get_config(s.TEMP) == "SHT35":
             temp_sensor = TempSHT35(TEMP_logger, status_logger)
     status_logger.info("Temperature and humidity sensor initialised")
@@ -178,6 +178,7 @@ try:
     if sensors[s.PM1]:
         initialise_pm_sensor(
             sensor_name=s.PM1,
+            sensor_type=config.get_config(s.PM1),
             pins=("P3", "P17"),
             serial_id=1,
             status_logger=status_logger,
@@ -185,6 +186,7 @@ try:
     if sensors[s.PM2]:
         initialise_pm_sensor(
             sensor_name=s.PM2,
+            sensor_type=config.get_config(s.PM2),
             pins=("P11", "P18"),
             serial_id=2,
             status_logger=status_logger,

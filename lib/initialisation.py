@@ -72,7 +72,7 @@ def initialise_time(rtc, gps_on, logger):
     return no_time, update_time_later
 
 
-def initialise_pm_sensor(sensor_name, pins, serial_id, status_logger):
+def initialise_pm_sensor(sensor_name, sensor_type, pins, serial_id, status_logger):
     """
 
     :param sensor_name: PM1 or PM2
@@ -86,7 +86,7 @@ def initialise_pm_sensor(sensor_name, pins, serial_id, status_logger):
     """
     try:
         # Start PM sensor thread
-        _thread.start_new_thread(pm_thread, (sensor_name, status_logger, pins, serial_id))
+        _thread.start_new_thread(pm_thread, (sensor_name, sensor_type, status_logger, pins, serial_id))
 
         status_logger.info("Sensor " + sensor_name + " initialised")
     except Exception as e:

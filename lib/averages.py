@@ -7,6 +7,7 @@ from helper import mean_across_arrays, minutes_of_the_month, blink_led, get_sens
 from Configuration import config
 import strings as s
 import time
+import ujson
 
 
 def get_sensor_averages(logger, lora):
@@ -31,7 +32,7 @@ def get_sensor_averages(logger, lora):
         sensor_averages = {}
         for sensor_name in [s.TEMP, s.PM1, s.PM2]:
             if sensors[sensor_name]:
-                sensor_averages.update(calculate_average(sensor_name, logger))
+                sensor_averages.update(get_average(sensor_name, logger))
 
         # Append averages to the line to be sent over LoRa according to which sensors are defined.
         line_to_log = '{}' + fmt + ',' + version + ',' + minutes
@@ -50,7 +51,7 @@ def get_sensor_averages(logger, lora):
         path = s.processing_path
         for sensor_name in [s.TEMP, s.PM1, s.PM2]:
             if sensors[sensor_name]:
-                filename = sensor_name + '.csv'
+                filename = sensor_name + '.json'
                 try:
                     os.remove(path + filename)
                 except Exception as e:
@@ -61,59 +62,33 @@ def get_sensor_averages(logger, lora):
         blink_led((0x550000, 0.4, True))
 
 
-def calculate_average(sensor_name, logger):
+def get_average(sensor_name, logger):
     """
-    Calculates averages for specific columns of sensor data to be sent over LoRa. Sets placeholders if it fails.
+    Gets averages for specific columns of sensor data to be sent over LoRa.
+    Sets placeholders if it fails.
     :param sensor_name: PM1, PM2 or TEMP
     :type sensor_name: str
     :param logger: status logger
     :type logger: LoggerFactory object
     """
-
-    filename = sensor_name + '.csv'
-    sensor_type = config.get_config(sensor_name)
-    sensor_id = str(config.get_config(sensor_name + "_id"))
-    # headers in current file of the sensor according to its type
-    headers = s.headers_dict_v4[sensor_type]
-
-    # data to send if no readings are available
-    avg_readings_str = list('0' * len(s.lora_sensor_headers[sensor_type]))
-    count = 0
+    filename = sensor_name + '.json'
+    averaged = {sensor_name + "_avg": [], sensor_name + "_count": 0}
 
     try:
         with current_lock:
-            # Move sensor_name.csv from current dir to processing dir
+            # Move sensor_name.json from current dir to processing dir
             os.rename(s.current_path + filename, s.processing_path + filename)
-
+            # Read from processing dir and return found data.
             with open(s.processing_path + filename, 'r') as f:
-                # read all lines from processing
-                lines = f.readlines()
-                lines_lst = []  # list of lists that store average sensor readings from specific columns
-                for line in lines:
-                    stripped_line = line[:-1]  # strip \n
-                    stripped_line_lst = str(stripped_line).split(',')  # split string to list at comas
-                    named_line = dict(zip(headers, stripped_line_lst))  # assign each value to its header
-                    sensor_reading = []
-                    for header in s.lora_sensor_headers[sensor_type]:
-                        sensor_reading.append(int(named_line[header]))
-                    # Append extra lines here for more readings - update version number and back-end to interpret data
-                    lines_lst.append(sensor_reading)
-                    count += 1
+                averaged = ujson.loads(f.read())
 
-                # Compute averages from sensor_name.csv.processing
-                avg_readings_str = [str(int(i)) for i in mean_across_arrays(lines_lst)]
-
-                # Append content of sensor_name.csv.processing into sensor_name.csv
-                with open(s.archive_path + sensor_name + '_' + sensor_id + '.csv', 'a') as f:
-                    for line in lines:
-                        f.write(line)
-
-    except Exception as e:
+    except Exception:
         logger.error("No readings from sensor {}".format(sensor_name))
         logger.warning("Setting 0 as a place holder")
         blink_led((0x550000, 0.4, True))
+
     finally:
-        return {sensor_name + "_avg": avg_readings_str, sensor_name + "_count": count}
+        return averaged
 
 
 def log_averages(line_to_log):
@@ -122,7 +97,6 @@ def log_averages(line_to_log):
     :param line_to_log: line of averages to log
     :type line_to_log: str
     """
-
     # Save averages to a new file each month
     archive_filename = "{:04d}_{:02d}".format(*time.gmtime()[:2]) + "_Sensor_Averages"  # yyyy_mm_Sensor_Averages
     archive_filepath = s.archive_averages_path + archive_filename + ".csv"  # /sd/archive/Averages/archive_filename
