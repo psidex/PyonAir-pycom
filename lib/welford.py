@@ -2,8 +2,7 @@ class WelfordAverage:
     # https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
     # Do the average in a single pass!
 
-    def __init__(self, logger=None, count=0, mean=0, m2=0):
-        self.logger = logger
+    def __init__(self, count=0, mean=0, m2=0):
         self.count = count
         self.mean = mean
         self.m2 = m2

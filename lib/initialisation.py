@@ -1,12 +1,13 @@
-from RtcDS1307 import clock
-import GpsSIM28
-from PM_read import pm_thread
-from loggingpycom import INFO, WARNING, CRITICAL, DEBUG, ERROR
-from Configuration import config
 import _thread
-import strings as s
 import os
 import pycom
+
+import GpsSIM28
+import strings as s
+from Configuration import config
+from loggingpycom import CRITICAL, DEBUG, ERROR, INFO, WARNING
+from PM_read import pm_thread
+from RtcDS1307 import clock
 
 
 def initialise_time(rtc, gps_on, logger):
@@ -72,7 +73,7 @@ def initialise_time(rtc, gps_on, logger):
     return no_time, update_time_later
 
 
-def initialise_pm_sensor(sensor_name, sensor_type, pins, serial_id, status_logger):
+def initialise_pm_sensor(sensor_name, sensor_logger, pins, serial_id, status_logger):
     """
 
     :param sensor_name: PM1 or PM2
@@ -86,7 +87,10 @@ def initialise_pm_sensor(sensor_name, sensor_type, pins, serial_id, status_logge
     """
     try:
         # Start PM sensor thread
-        _thread.start_new_thread(pm_thread, (sensor_name, sensor_type, status_logger, pins, serial_id))
+        _thread.start_new_thread(
+            pm_thread,
+            (sensor_name, sensor_logger, status_logger, pins, serial_id)
+        )
 
         status_logger.info("Sensor " + sensor_name + " initialised")
     except Exception as e:

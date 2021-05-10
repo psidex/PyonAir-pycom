@@ -1,15 +1,16 @@
-import machine
-from machine import RTC, Timer
-from averages import get_sensor_averages
-from helper import seconds_to_first_event
-from Configuration import config
-import GpsSIM28
 import _thread
 import time
+import machine
+from machine import RTC, Timer
+
+import GpsSIM28
+from averages import get_sensor_averages
+from Configuration import config
+from helper import seconds_to_first_event
 
 
 class EventScheduler:
-    def __init__(self, logger, data_type, lora):
+    def __init__(self, logger, data_type, lora, sensor_loggers=[]):
         """
         Schedules events for calculating averages or getting GPS position and also schedules random LoRa messages for
         each interval
@@ -19,10 +20,13 @@ class EventScheduler:
         :type data_type: str
         :param lora: LoRaWan object, False if lora is not enabled
         :type lora: LoRaWAN object
+        :param sensor_loggers: A list of sensor loggers if data_type is "sensors"
+        :type sensor_loggers: list
         """
 
         #  Arguments
         self.logger = logger
+        self.sensor_loggers = sensor_loggers
         self.data_type = data_type
         self.lora = lora
 
@@ -57,8 +61,12 @@ class EventScheduler:
             _thread.start_new_thread(GpsSIM28.get_position, (self.logger, self.lora))
 
         elif self.data_type == "sensors":
-            #  flash averages of PM data to sd card to be sent over LoRa
-            get_sensor_averages(logger=self.logger, lora=self.lora)
+            # Put new averages in lora buffer and also print to terminal
+            get_sensor_averages(
+                logger=self.logger,
+                sensor_loggers=self.sensor_loggers,
+                lora=self.lora
+            )
 
             if self.lora is not False:  # Schedule LoRa messages if LoRa is enabled
                 # if device was last transmitting a day or more ago, reset message_count for the day

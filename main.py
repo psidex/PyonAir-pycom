@@ -161,11 +161,19 @@ try:
     if (True in sensors.values() or gps_on) and config.get_config("LORA") == "ON":
         lora = LoRaWAN(status_logger)
 
+    # Store a list of sensor loggers so they can be written to from pm_thread but read
+    # from in EventScheduler.
+    sensor_loggers = []
+
     # Initialise temperature and humidity sensor thread with id: TEMP
     if sensors[s.TEMP]:
-        TEMP_logger = SensorLogger(sensor_name=s.TEMP, sensor_type=config.get_config(s.TEMP), terminal_out=True)
+
+        TEMP_logger = SensorLogger(sensor_name=s.TEMP)
+        sensor_loggers.append(TEMP_logger)
+
         if config.get_config(s.TEMP) == "SHT35":
             temp_sensor = TempSHT35(TEMP_logger, status_logger)
+            
     status_logger.info("Temperature and humidity sensor initialised")
 
     # Initialise PM power circuitry
@@ -174,19 +182,26 @@ try:
     if config.get_config(s.PM1) != "OFF" or config.get_config(s.PM2) != "OFF":
         PM_transistor.value(1)
 
-    # Initialise PM sensor threads
+    # Initialise PM sensor loggers and threads
     if sensors[s.PM1]:
+        pm1_sensor_logger = SensorLogger(sensor_name=s.PM1)
+        sensor_loggers.append(pm1_sensor_logger)
+
         initialise_pm_sensor(
             sensor_name=s.PM1,
-            sensor_type=config.get_config(s.PM1),
+            sensor_logger=pm1_sensor_logger,
             pins=("P3", "P17"),
             serial_id=1,
             status_logger=status_logger,
         )
+
     if sensors[s.PM2]:
+        pm2_sensor_logger = SensorLogger(sensor_name=s.PM2)
+        sensor_loggers.append(pm2_sensor_logger)
+
         initialise_pm_sensor(
             sensor_name=s.PM2,
-            sensor_type=config.get_config(s.PM2),
+            sensor_logger=pm2_sensor_logger,
             pins=("P11", "P18"),
             serial_id=2,
             status_logger=status_logger,
@@ -194,8 +209,9 @@ try:
 
     # Start scheduling lora messages if any of the sensors are defined
     if True in sensors.values():
-        PM_Events = EventScheduler(logger=status_logger, data_type="sensors", lora=lora)
+        PM_Events = EventScheduler(logger=status_logger, data_type="sensors", lora=lora, sensor_loggers=sensor_loggers)
     if gps_on:
+        # TODO: Does GPS need something like sensor_loggers? I don't think so.
         GPS_Events = EventScheduler(logger=status_logger, data_type="gps", lora=lora)
 
     status_logger.info("Initialisation finished")

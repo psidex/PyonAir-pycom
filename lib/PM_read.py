@@ -1,13 +1,14 @@
+import time
+from machine import Timer
+
+from Configuration import config
+from helper import blink_led, mean_across_arrays
 from plantowerpycom import Plantower, PlantowerException
 from sensirionpycom import Sensirion, SensirionException
-from helper import mean_across_arrays, blink_led
-from Configuration import config
-from machine import Timer
 from SensorLogger import SensorLogger
-import time
 
 
-def pm_thread(sensor_name, sensor_type, status_logger, pins, serial_id):
+def pm_thread(sensor_name, sensor_logger, status_logger, pins, serial_id):
     """
     Method to run as a thread that reads, processes and logs readings form pm sensors according to their type
     :param sensor_name: PM1 or PM2
@@ -21,10 +22,10 @@ def pm_thread(sensor_name, sensor_type, status_logger, pins, serial_id):
     """
 
     status_logger.debug("Thread {} started".format(sensor_name))
-
-    sensor_logger = SensorLogger(sensor_name=sensor_name, sensor_type=sensor_type, terminal_out=True)
-
     sensor_type = config.get_config(sensor_name)
+
+    # sensor_logger = SensorLogger(sensor_name=sensor_name, terminal_out=True)
+
     init_time = int(config.get_config(sensor_name + "_init"))
 
     init_count = 0
