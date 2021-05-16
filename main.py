@@ -78,9 +78,7 @@ try:
             )
 
     # Check if GPS is enabled in configurations
-    gps_on = True
-    if config.get_config("GPS") == "OFF":
-        gps_on = False
+    gps_on = False if config.get_config("GPS") == "OFF" else True
 
     # Get current time
     rtc = RTC()
@@ -122,7 +120,8 @@ except Exception as e:
     except Exception:
         reset()
 
-pycom.rgbled(0x552000)  # flash orange until its loaded
+# Show orange until its loaded
+pycom.rgbled(0x552000)
 
 # If sd, time, logger and configurations were set, continue with initialisation
 try:
@@ -167,12 +166,11 @@ try:
 
     # Initialise temperature and humidity sensor thread with id: TEMP
     if sensors[s.TEMP]:
-
         TEMP_logger = SensorLogger(sensor_name=s.TEMP)
         sensor_loggers.append(TEMP_logger)
-
         if config.get_config(s.TEMP) == "SHT35":
-            temp_sensor = TempSHT35(TEMP_logger, status_logger)
+            # Start reading and logging from sensor.
+            TempSHT35(TEMP_logger, status_logger)
             
     status_logger.info("Temperature and humidity sensor initialised")
 
@@ -181,6 +179,17 @@ try:
     PM_transistor.value(0)
     if config.get_config(s.PM1) != "OFF" or config.get_config(s.PM2) != "OFF":
         PM_transistor.value(1)
+
+    # TODO: Test this
+    if config.get_config("hardware_test").lower() == "yes":
+        test_logger = logger_factory.create_status_logger(
+            "hardware_test_logger", level=DEBUG, terminal_out=True, filename="hardware_test_log.txt"
+        )
+
+        # Import here instead of at top since we usually don't need it.
+        from hardwaretest import HardwareTester
+        t = HardwareTester(test_logger)
+        t.run_test()
 
     # Initialise PM sensor loggers and threads
     if sensors[s.PM1]:
@@ -211,7 +220,6 @@ try:
     if True in sensors.values():
         PM_Events = EventScheduler(logger=status_logger, data_type="sensors", lora=lora, sensor_loggers=sensor_loggers)
     if gps_on:
-        # TODO: Does GPS need something like sensor_loggers? I don't think so.
         GPS_Events = EventScheduler(logger=status_logger, data_type="gps", lora=lora)
 
     status_logger.info("Initialisation finished")

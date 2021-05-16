@@ -90,9 +90,7 @@ def get_new_config(sct, logger):
                 client, address = sct.accept()  # wait for new connection
             except Exception as e:
                 raise Exception("Configuration timeout")
-            client.send(
-                get_html_form()
-            )  # send html page with form to submit by the user
+            client.send(get_html_form())  # send html page with form to submit by the user
             pycom.rgbled(0x005500)  # Green LED - Connection successful
             received_data = str(client.recv(3000))  # wait for client response
             # logger.debug(received_data)

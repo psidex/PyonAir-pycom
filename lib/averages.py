@@ -2,14 +2,11 @@
 Tasks to be called by event scheduler
 """
 
-import os
 import time
-import ujson
 
 import strings as s
 from Configuration import config
-from helper import (blink_led, current_lock, get_format, get_sensors,
-                    mean_across_arrays, minutes_of_the_month)
+from helper import blink_led, get_format, get_sensors, minutes_of_the_month
 
 
 def get_sensor_averages(logger, sensor_loggers, lora):

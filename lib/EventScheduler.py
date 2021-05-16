@@ -1,7 +1,7 @@
 import _thread
 import time
 import machine
-from machine import RTC, Timer
+from machine import Timer
 
 import GpsSIM28
 from averages import get_sensor_averages
@@ -23,45 +23,38 @@ class EventScheduler:
         :param sensor_loggers: A list of sensor loggers if data_type is "sensors"
         :type sensor_loggers: list
         """
-
-        #  Arguments
         self.logger = logger
         self.sensor_loggers = sensor_loggers
         self.data_type = data_type
         self.lora = lora
 
-        #  Attributes
         if self.data_type == "sensors":
             self.interval_s = int(float(config.get_config("interval"))*60)
             if self.interval_s < 15 * 60:
                 self.logger.warning("Interval is less than 15 mins - real time transmission is not guaranteed")
         elif self.data_type == "gps":
             self.interval_s = int(float(config.get_config("GPS_period"))*3600)
+
         self.s_to_next_lora = None
-        self.first_alarm = None
         self.periodic_alarm = None
         self.random_alarm = None
 
-        #  Start scheduling events
-        self.start_events()
-
-    #  Calculates time (s) until the first event, and sets up an alarm
-    def start_events(self):
+        # Start scheduling events - cCalculate time (s) until the first event, and set up an alarm
         first_event_s = seconds_to_first_event(self.interval_s)
         self.first_alarm = Timer.Alarm(self.first_event, s=first_event_s, periodic=False)
 
     def first_event(self, arg):
-        #  set up periodic alarm with specified interval to calculate averages
+        # Set up periodic alarm with specified interval to calculate averages
         self.periodic_alarm = Timer.Alarm(self.periodic_event, s=self.interval_s, periodic=True)
         self.periodic_event(arg)
 
     def periodic_event(self, arg):
         if self.data_type == "gps":
-            #  get position from gps to be sent over LoRA
+            # Get position from gps to be sent over LoRA
             _thread.start_new_thread(GpsSIM28.get_position, (self.logger, self.lora))
 
         elif self.data_type == "sensors":
-            # Put new averages in lora buffer and also print to terminal
+            # Put new averages in lora buffer and also print to terminal.
             get_sensor_averages(
                 logger=self.logger,
                 sensor_loggers=self.sensor_loggers,
@@ -104,9 +97,8 @@ class EventScheduler:
             raise Exception("Non existent data type")
 
     def random_event(self, arg):
-        # start LoRa thread
-        arg1, arg2 = 0, 0  # threading library not fully implemented - only works with a tuple of at least 2 args
-        _thread.start_new_thread(self.lora.lora_send, (arg1, arg2))
+        # Start LoRa thread (threading library requires a tuple even if no args)
+        _thread.start_new_thread(self.lora.lora_send, tuple())
 
 
 def get_random_time():

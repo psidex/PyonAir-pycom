@@ -55,7 +55,6 @@ class Configuration:
         :type new_config: dict
         """
         self.set_config(new_config)
-
         with open(s.root_path + s.config_filename, 'w') as f:  # save credentials to sd card
             f.write(ujson.dumps(self.configuration))
 

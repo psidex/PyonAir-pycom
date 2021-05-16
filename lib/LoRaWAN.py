@@ -101,7 +101,7 @@ class LoRaWAN:
         except Exception as e:
             self.logger.exception("Failed to interpret message received over LoRa")
 
-    def lora_send(self, arg1, arg2):
+    def lora_send(self):
         """Lora send method to run as a thread. Checks if messages are up to date in the lora buffer, pops the one on
         top of the stack, encodes it to a message and sends it to the right port.
         Takes two dummy arguments required by the threading library"""
@@ -129,15 +129,16 @@ class LoRaWAN:
                     self.logger.debug("LoRa - sent payload")
 
                     self.message_count += 1  # increment number of files sent over LoRa today
+                    
                     config.save_config({"message_count": self.message_count})  # save number of messages today
 
                     # remove message sent
                     self.lora_buffer.remove_head()
 
-            except Exception as e:
+            except Exception:
                 self.logger.exception("Sending payload over LoRaWAN failed")
                 blink_led((0x550000, 0.4, True))
-
+        
     def get_sending_details(self):
         """
         Gets message sitting on top of the lora stack, and constructs payload according to its format
