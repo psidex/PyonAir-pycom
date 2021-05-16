@@ -44,7 +44,6 @@ class HardwareTester:
             ))
 
             self.logger.info("Attempting to initialize sensor")
-            # TODO: Double check I got the pins a id's the right way round!
             try:
                 if sensor_type == "PMS5003":
                     sensor = Plantower(pins=("P3", "P17"), id=1,)
@@ -75,7 +74,7 @@ class HardwareTester:
                     init_count += 1
                 except Exception as e:
                     self.logger.exception("Failed to read from sensor: {}".format(e))
-                    continue
+                    pass
             
             time.sleep(3)  # We can't read the sensor too fast after warmup
             self.logger.info("Attempting read of data from sensor")
@@ -88,7 +87,7 @@ class HardwareTester:
                     self.logger.info("sensor.read returned no data")
             except Exception as e:
                 self.logger.exception("Failed to read from sensor {}".format(sensor_type))
-                continue
+                pass
 
             self.logger.info("Finished testing sensor {}".format(sensor_name))
 
