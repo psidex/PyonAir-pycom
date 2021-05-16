@@ -19,6 +19,8 @@ class TempSHT35(object):
 
         # get one sensor reading upon init to catch any errors and calibrate the sensor
         self.read()
+    
+    def start_timer(self):
         # start a periodic timer interrupt to poll readings at a frequency
         self.processing_alarm = Timer.Alarm(self.process_readings, s=int(config.get_config("TEMP_period")), periodic=True)
 

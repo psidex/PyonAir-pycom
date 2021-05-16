@@ -164,16 +164,6 @@ try:
     # from in EventScheduler.
     sensor_loggers = []
 
-    # Initialise temperature and humidity sensor thread with id: TEMP
-    if sensors[s.TEMP]:
-        TEMP_logger = SensorLogger(sensor_name=s.TEMP)
-        sensor_loggers.append(TEMP_logger)
-        if config.get_config(s.TEMP) == "SHT35":
-            # Start reading and logging from sensor.
-            TempSHT35(TEMP_logger, status_logger)
-            
-    status_logger.info("Temperature and humidity sensor initialised")
-
     # Initialise PM power circuitry
     PM_transistor = Pin("P20", mode=Pin.OUT)
     PM_transistor.value(0)
@@ -190,6 +180,16 @@ try:
         from hardwaretest import HardwareTester
         t = HardwareTester(test_logger)
         t.run_test()
+
+    # Initialise temperature and humidity sensor thread with id: TEMP
+    if sensors[s.TEMP]:
+        TEMP_logger = SensorLogger(sensor_name=s.TEMP)
+        sensor_loggers.append(TEMP_logger)
+        if config.get_config(s.TEMP) == "SHT35":
+            # Start reading and logging from sensor.
+            temp = TempSHT35(TEMP_logger, status_logger)
+            temp.start_timer()
+    status_logger.info("Temperature and humidity sensor initialised")
 
     # Initialise PM sensor loggers and threads
     if sensors[s.PM1]:

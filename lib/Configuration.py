@@ -35,7 +35,12 @@ class Configuration:
         if isinstance(keys, list):
             return list(self.configuration[k] for k in keys if k in self.configuration)
         else:
-            return self.configuration[keys]
+            try:
+                val = self.configuration[keys]
+            except KeyError:
+                # If that key doesn't exist, return None.
+                val = None
+            return val
 
     # Configuration Mutator/Setter
     def set_config(self, new_config):
