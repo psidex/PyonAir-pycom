@@ -4,11 +4,9 @@ Replaces the functionality of the sensor logger that was previously produced by 
 """
 import _thread
 import sys
-import ujson
 
 import strings as s
 from Configuration import config
-from helper import current_lock
 from welford import WelfordAverage
 
 class SensorLogger:

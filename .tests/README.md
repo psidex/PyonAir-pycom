@@ -6,5 +6,5 @@ To run tests:
 
 ```shell
 $ cd .tests
-$ python -m unittest discover
+$ python3 -m unittest discover
 ```

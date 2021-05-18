@@ -18,7 +18,7 @@ class HardwareTester:
         self.logger = logger
     
     def run_test(self):
-        pycom.rgbled(0x66039a)
+        pycom.rgbled(0x66039a)  # Purple :]
         self.logger.info("Running hardware test")
 
         active_sensors = get_sensors()
@@ -92,4 +92,4 @@ class HardwareTester:
             self.logger.info("Finished testing sensor {}".format(sensor_name))
 
         self.logger.info("Hardware test finished")
-        pycom.rgbled(0x000000)
+        pycom.rgbled(0x000000)  # Turn off

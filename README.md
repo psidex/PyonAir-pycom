@@ -49,6 +49,7 @@ If required to reconfigure the device, simply hold the button for 3 seconds, whi
 * **Red light blinking** immediately after boot indicates an issue with SD Card (perhaphs it is not plugged in or is not formatted correctly) or an issue with the [Real Time Clock](https://s-u-pm-sensor.gitbook.io/instructions/hardware/hardware-overview/ds3231-real-time-clock). This error will not be logged into a logging file; however, it still can be seen in Pymakr's REPL if the LoPy is connected to your machine.
 * **Red light flashing during initialisation** indicates an issue somewhere else. This issue will be logged into _status_log.txt_ file saved on the SD Card. This error can also be seen in Pymakr's REPL after connecting LoPy to your machine.
 * **Red blinks** during normal operation indicates runtime errors. 
+* **Purple light** means the device is performing a hardware test, which you can initialise by setting the "hardware_test" variable in the config to "yes"
 
 If there are any issues, please report them on [GitHub Issues](https://github.com/pyonair/PyonAir-pycom/issues).
 
@@ -72,6 +73,7 @@ Special thanks to [Dr Steven J Johnston](https://www.southampton.ac.uk/engineeri
 * **[Daniel Hausner](https://github.com/danhaus)** - *Initial work & software development*
 * **[Peter Varga](https://github.com/pe-varga)** - *Initial work & software development*
 * **[Hazel Mitchell](https://github.com/CeruleanMars)** - *Initial work & hardware*
+* **[Simon Jenner](https://github.com/psidex)** - *Continued development of software*
 
 See also the list of [contributors](https://github.com/pyonair/PyonAir-pycom/graphs/contributors) who participated in this project.
 

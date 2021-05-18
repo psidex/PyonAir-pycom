@@ -44,50 +44,65 @@ def get_html_form():
         if level == config.get_config("logging_lvl"):
             selected_logging[level] = " selected"
 
-    with open("form.html", "r") as html_file:
+    hardware_test_on = "selected" if config.get_config("hardware_test").lower() == "yes" else ""
+    hardware_test_off = "selected" if hardware_test_on == "" else ""
+
+    with open("/flash/lib/setup/form.html", "r") as html_file:
         html = html_file.read()
 
-    # This is kinda cumbersome but allows for easy insertion into the html.
-    return html.format(
-        unique_id = str(config.get_config("device_id")),
-        device_name = str(config.get_config("device_name")),
-        password = str(config.get_config("password")),
-        config_timeout = str(config.get_config("config_timeout")),
-        device_eui = str(config.get_config("device_eui")),
-        application_eui = str(config.get_config("application_eui")),
-        app_key = str(config.get_config("app_key")),
-        fair_access = str(config.get_config("fair_access")),
-        air_time = str(config.get_config("air_time")),
-        SSID = str(config.get_config("SSID")),
-        wifi_password = str(config.get_config("wifi_password")),
-        TEMP_id = str(config.get_config("TEMP_id")),
-        TEMP_period = str(config.get_config("TEMP_period")),
-        PM1_id = str(config.get_config("PM1_id")),
-        PM1_init = str(config.get_config("PM1_init")),
-        interval = str(config.get_config("interval")),
-        PM2_id = str(config.get_config("PM2_id")),
-        PM2_init = str(config.get_config("PM2_init")),
-        GPS_id = str(config.get_config("GPS_id")),
-        GPS_timeout = str(config.get_config("GPS_timeout")),
-        GPS_period = str(config.get_config("GPS_period")),
-        lora_check = lora_check,
-        eu_selected = str(selected_region["Europe"]),
-        as_selected = str(selected_region["Asia"]),
-        au_selected = str(selected_region["Australia"]),
-        us_selected = str(selected_region["United States"]),
-        temp_selected_SHT35 = str(selected_TEMP["SHT35"]),
-        temp_selected_off = str(selected_TEMP["OFF"]),
-        PM1_PMS5003_selected = str(selected_PM1["PMS5003"]),
-        PM1_SPS030_selected = str(selected_PM1["SPS030"]),
-        PM1_selected_off = str(selected_PM1["OFF"]),
-        PM2_PMS5003_selected = str(selected_PM2["PMS5003"]),
-        PM2_SPS030_selected = str(selected_PM2["SPS030"]),
-        PM2_selected_off = str(selected_PM2["OFF"]),
-        gps_selected_SIM28 = str(selected_GPS["SIM28"]),
-        gps_selected_off = str(selected_GPS["OFF"]),
-        logging_level_selected_critical = str(selected_logging["Critical"]),
-        logging_level_selected_error = str(selected_logging["Error"]),
-        logging_level_selected_warning = str(selected_logging["Warning"]),
-        logging_level_selected_info = str(selected_logging["Info"]),
-        logging_level_selected_debug = str(selected_logging["Debug"]),
-    )
+    # This is quite cumbersome but allows for easy insertion into the html.
+    # If you want to add another variable into the HTML form, all you have to do is
+    # refer to it like {this}, and then in the dict below add a line like this:
+    # "this": variable_you_want_to_insert,
+    # Take note that in the html you surround it with {} but you dont in the dict.
+
+    replacements = {
+        "unique_id": str(config.get_config("device_id")),
+        "device_name": str(config.get_config("device_name")),
+        "password": str(config.get_config("password")),
+        "config_timeout": str(config.get_config("config_timeout")),
+        "device_eui": str(config.get_config("device_eui")),
+        "application_eui": str(config.get_config("application_eui")),
+        "app_key": str(config.get_config("app_key")),
+        "fair_access": str(config.get_config("fair_access")),
+        "air_time": str(config.get_config("air_time")),
+        "SSID": str(config.get_config("SSID")),
+        "wifi_password": str(config.get_config("wifi_password")),
+        "TEMP_id": str(config.get_config("TEMP_id")),
+        "TEMP_period": str(config.get_config("TEMP_period")),
+        "PM1_id": str(config.get_config("PM1_id")),
+        "PM1_init": str(config.get_config("PM1_init")),
+        "interval": str(config.get_config("interval")),
+        "PM2_id": str(config.get_config("PM2_id")),
+        "PM2_init": str(config.get_config("PM2_init")),
+        "GPS_id": str(config.get_config("GPS_id")),
+        "GPS_timeout": str(config.get_config("GPS_timeout")),
+        "GPS_period": str(config.get_config("GPS_period")),
+        "lora_check": lora_check,
+        "eu_selected": str(selected_region["Europe"]),
+        "as_selected": str(selected_region["Asia"]),
+        "au_selected": str(selected_region["Australia"]),
+        "us_selected": str(selected_region["United States"]),
+        "temp_selected_SHT35": str(selected_TEMP["SHT35"]),
+        "temp_selected_off": str(selected_TEMP["OFF"]),
+        "PM1_PMS5003_selected": str(selected_PM1["PMS5003"]),
+        "PM1_SPS030_selected": str(selected_PM1["SPS030"]),
+        "PM1_selected_off": str(selected_PM1["OFF"]),
+        "PM2_PMS5003_selected": str(selected_PM2["PMS5003"]),
+        "PM2_SPS030_selected": str(selected_PM2["SPS030"]),
+        "PM2_selected_off": str(selected_PM2["OFF"]),
+        "gps_selected_SIM28": str(selected_GPS["SIM28"]),
+        "gps_selected_off": str(selected_GPS["OFF"]),
+        "logging_level_selected_critical": str(selected_logging["Critical"]),
+        "logging_level_selected_error": str(selected_logging["Error"]),
+        "logging_level_selected_warning": str(selected_logging["Warning"]),
+        "logging_level_selected_info": str(selected_logging["Info"]),
+        "logging_level_selected_debug": str(selected_logging["Debug"]),
+        "hardware_test_on": hardware_test_on,
+        "hardware_test_off": hardware_test_off,
+    }
+
+    for where, to_copy in replacements.items():
+        html = html.replace("{" + where + "}", to_copy)
+    
+    return html

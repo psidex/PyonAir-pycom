@@ -128,7 +128,6 @@ try:
     from SensorLogger import SensorLogger
     from EventScheduler import EventScheduler
     from helper import blink_led, get_sensors, led_lock
-    from averages import get_sensor_averages
     from TempSHT35 import TempSHT35
     import GpsSIM28
     import _thread
@@ -170,14 +169,13 @@ try:
     if config.get_config(s.PM1) != "OFF" or config.get_config(s.PM2) != "OFF":
         PM_transistor.value(1)
 
-    # TODO: Test this
+    # Perform a hardware test if it's in the config.
     if config.get_config("hardware_test").lower() == "yes":
+        from hardwaretest import HardwareTester  # Only import if needed
         test_logger = logger_factory.create_status_logger(
-            "hardware_test_logger", level=DEBUG, terminal_out=True, filename="hardware_test_log.txt"
+            "hardware_test_logger", level=DEBUG, terminal_out=True,
+            filename="hardware_test_log.txt"
         )
-
-        # Import here instead of at top since we usually don't need it.
-        from hardwaretest import HardwareTester
         t = HardwareTester(test_logger)
         t.run_test()
 
