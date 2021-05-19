@@ -13,7 +13,11 @@
             font-family: helvetica;
             color: white;
             font-size: 15px;
-            }
+        }
+        .body-light {
+            background-color: white;
+            color: black;
+        }
         h1{
             margin-bottom: 0px;
         }
@@ -127,20 +131,26 @@
             color: pink;
             display: none;
         }
+        .hint-light{
+            color: red;
+        }
         </style>
     </head>
     <body>
+        <h1>PyonAir Configuration</h1>
         <form class="config_form">
-            <h1>PyonAir Configuration</h1>
-            </br>
-            <button id="showDescBtn" >Show Guide</button>
-            <p>General Settings</p>
-            <hr class="p_line"/>
-            <div class="settings">
-
+        </br>
+        <button id="showDescBtn" >Show Guide</button>
+        <button id="lightToggleBtn" >Light Theme</button>
+        <button type="submit">Save</button>
+        
+        <p>General Settings</p>
+        <hr class="p_line"/>
+        <div class="settings">
+            
             <label>Unique ID: {unique_id}</label>
             <p class="hint">The randomly generated unique ID of this device</p>
-
+            
             <label for="device_name">Device Name</label>
             <p class="hint">What would you like to name your device? Can be anything</p>
             <input class="input_text" id="device_name" name="device_name" type="text" value="{device_name}" required="required" maxlength="32"/>
@@ -153,18 +163,18 @@
             <p class="hint">How long to wait for a new config to be sent from this page</p>
             <input class="input_number" id="config_timeout" name="config_timeout" type="number" value="{config_timeout}" required="required" min="3" max="120" step="0.01"/>
             
-            </div>
-            <p>LoRaWAN Configuration</p>
-            <hr class="p_line"/>
-            <div class="settings">
-
+        </div>
+        <p>LoRaWAN Configuration</p>
+        <hr class="p_line"/>
+        <div class="settings">
+            
             <label>Device EUI: {device_eui}</label>
             <p class="hint">The manufacterer assigned "Extended Unique Identifier"</p>
             
             <label for="application_eui">Application EUI</label>
             <p class="hint">The Extended Unique Identifier assigned to your app by The Things Network</p>
             <input class="input_text" id="application_eui" name="application_eui" type="text" value="{application_eui}" required="required" maxlength="16"/>
-
+            
             <label for="app_key">App Key </label>
             <p class="hint">Your Things Network applications Access Key</p>
             <input class="input_text" id="app_key" name="app_key" type="password" value="{app_key}" required="required" maxlength="32"/>
@@ -199,34 +209,34 @@
             <p>WiFi Configuration</p>
             <hr class="p_line"/>
             <div class="settings">
-            <label for="SSID">SSID</label>
-            <p class="hint">The name of the Wi-Fi network to connect to</p>
+                <label for="SSID">SSID</label>
+                <p class="hint">The name of the Wi-Fi network to connect to</p>
             <input class="input_text" id="SSID" name="SSID" type="text" value="{SSID}" required="required" maxlength="32"/>
             <label for="wifi_password">Password</label>
             <p class="hint">The password for the given Wi-Fi network</p>
             <input class="input_text" id="wifi_password" name="wifi_password" type="password" value="{wifi_password}" required="required" maxlength="128"/>
-            </div>
-            <p>Sensor Settings</p>           
-            <hr class="p_line sensor_settings"/>
-            <p class="hint">Individual sensor settings. Type is the type of the sensor hardware, ID is how the code identifies it</p>
-            <div class="settings">
+        </div>
+        <p>Sensor Settings</p>           
+        <hr class="p_line sensor_settings"/>
+        <p class="hint">Individual sensor settings. Type is the type of the sensor hardware, ID is how the code identifies it</p>
+        <div class="settings">
             <label>Temperature and Humidity Sensor</label>
             <hr class="interval_hr"/>
             <div class="sensor">
                 <div>
-                <label for="TEMP">Sensor Type</label>
-                <select name="TEMP">
-                    <option{temp_selected_SHT35}>SHT35</option>
-                    <option{temp_selected_off}>OFF</option>
-                </select>
+                    <label for="TEMP">Sensor Type</label>
+                    <select name="TEMP">
+                        <option{temp_selected_SHT35}>SHT35</option>
+                        <option{temp_selected_off}>OFF</option>
+                    </select>
                 </div>
                 <div>
-                <label for="TEMP_id">Sensor ID</label>
-                <input class="input_number" id="TEMP_id" name="TEMP_id" type="number" value="{TEMP_id}" required="required" min="0" max="65535"/>
+                    <label for="TEMP_id">Sensor ID</label>
+                    <input class="input_number" id="TEMP_id" name="TEMP_id" type="number" value="{TEMP_id}" required="required" min="0" max="65535"/>
                 </div>
                 <div>
-                <label for="TEMP_period">Period (s)</label>
-                <input class="input_number" id="TEMP_period" name="TEMP_freq" type="number" value="{TEMP_period}" required="required" min="1" max="120"/>
+                    <label for="TEMP_period">Period (s)</label>
+                    <input class="input_number" id="TEMP_period" name="TEMP_freq" type="number" value="{TEMP_period}" required="required" min="1" max="120"/>
                 </div>
             </div>
             <label>Particulate Matter Sensors</label>
@@ -238,21 +248,21 @@
                 </div>
                 <div class="sensor grid_item2">
                     <div>
-                    <label for="PM1">Sensor Type</label>
-                    <select name="PM1">
-                        <option{PM1_PMS5003_selected}>PMS5003</option>
-                        <option{PM1_SPS030_selected}>SPS030</option>
-                        <option{PM1_selected_off}>OFF</option>
-                    </select>
+                        <label for="PM1">Sensor Type</label>
+                        <select name="PM1">
+                            <option{PM1_PMS5003_selected}>PMS5003</option>
+                            <option{PM1_SPS030_selected}>SPS030</option>
+                            <option{PM1_selected_off}>OFF</option>
+                        </select>
                     </div>
                     <div>
-                    <label for="PM1_id">Sensor ID</label>
-                    <input class="input_number" id="PM1_id" name="PM1_id" type="number" value="{PM1_id}" required="required" min="0" max="65535"/>
+                        <label for="PM1_id">Sensor ID</label>
+                        <input class="input_number" id="PM1_id" name="PM1_id" type="number" value="{PM1_id}" required="required" min="0" max="65535"/>
                     </div>
                     <div>
                     <label for="PM1_init">Setup Time (s)</label>
                     <input class="input_number" id="PM1_init" name="PM1_init" type="number" value="{PM1_init}" required="required" min="1" max="3600" step="0.01"/>
-                    </div>
+                </div>
                 </div>
                 <div class="grid_item3">
                     <label for="interval">Interval (m)</label>
@@ -264,56 +274,56 @@
                 </div>
                 <div class="sensor grid_item5">
                     <div>
-                    <label for="PM2">Sensor Type</label>
-                    <select name="PM2">
-                        <option{PM2_PMS5003_selected}>PMS5003</option>
-                        <option{PM2_SPS030_selected}>SPS030</option>
-                        <option{PM2_selected_off}>OFF</option>
-                    </select>
+                        <label for="PM2">Sensor Type</label>
+                        <select name="PM2">
+                            <option{PM2_PMS5003_selected}>PMS5003</option>
+                            <option{PM2_SPS030_selected}>SPS030</option>
+                            <option{PM2_selected_off}>OFF</option>
+                        </select>
                     </div>
                     <div>
-                    <label for="PM2_id">Sensor ID</label>
-                    <input class="input_number" id="PM2_id" name="PM2_id" type="number" value="{PM2_id}" required="required" min="0" max="65535"/>
+                        <label for="PM2_id">Sensor ID</label>
+                        <input class="input_number" id="PM2_id" name="PM2_id" type="number" value="{PM2_id}" required="required" min="0" max="65535"/>
                     </div>
                     <div>
-                    <label for="PM2_init">Setup Time (s)</label>
-                    <input class="input_number" id="PM2_init" name="PM2_init" type="number" value="{PM2_init}" required="required" min="1" max="3600" step="0.01"/>
+                        <label for="PM2_init">Setup Time (s)</label>
+                        <input class="input_number" id="PM2_init" name="PM2_init" type="number" value="{PM2_init}" required="required" min="1" max="3600" step="0.01"/>
                     </div>
                 </div>
                 </div>
-            <label>GPS</label>
+                <label>GPS</label>
             <hr class="gps_hr"/>
             <div class="sensor">
                 <div>
-                <label for="GPS">Sensor Type</label>
-                <select name="GPS">
-                    <option{gps_selected_SIM28}>SIM28</option>
-                    <option{gps_selected_off}>OFF</option>
-                </select>
+                    <label for="GPS">Sensor Type</label>
+                    <select name="GPS">
+                        <option{gps_selected_SIM28}>SIM28</option>
+                        <option{gps_selected_off}>OFF</option>
+                    </select>
                 </div>
                 <div>
-                <label for="GPS_id">Sensor ID</label>
-                <input class="input_number" id="GPS_id" name="GPS_id" type="number" value="{GPS_id}" required="required" min="0" max="65535"/>
+                    <label for="GPS_id">Sensor ID</label>
+                    <input class="input_number" id="GPS_id" name="GPS_id" type="number" value="{GPS_id}" required="required" min="0" max="65535"/>
                 </div>
                 <div>
-                <label for="GPS_timeout">Timeout (m)</label>
-                <input class="input_number" id="GPS_timeout" name="GPS_timeout" type="number" value="{GPS_timeout}" required="required" min="5" max="120" step="0.01"/>
+                    <label for="GPS_timeout">Timeout (m)</label>
+                    <input class="input_number" id="GPS_timeout" name="GPS_timeout" type="number" value="{GPS_timeout}" required="required" min="5" max="120" step="0.01"/>
                 </div>
                 <div>
                 <label for="GPS_period">Period (h)</label>
                 <input class="input_number" id="GPS_period" name="GPS_period" type="number" value="{GPS_period}" required="required" min="0.1" max="8760" step="0.01"/>
                 </div>
             </div>
-            </div>
+        </div>
             <hr class="p_line sensor_settings"/>
             <label for="logging_lvl">Select Logging Level</label>
             <p class="hint">What level of information do you want in your logs</p>
             <select id="logging_lvl" name="logging_lvl">
-            <option{logging_level_selected_critical}>Critical</option>
-            <option{logging_level_selected_error}>Error</option>
-            <option{logging_level_selected_warning}>Warning</option>
-            <option{logging_level_selected_info}>Info</option>
-            <option{logging_level_selected_debug}>Debug</option>
+                <option{logging_level_selected_critical}>Critical</option>
+                <option{logging_level_selected_error}>Error</option>
+                <option{logging_level_selected_warning}>Warning</option>
+                <option{logging_level_selected_info}>Info</option>
+                <option{logging_level_selected_debug}>Debug</option>
             </select>
             <div class="hardware_test_grid">
                 <div>
@@ -330,46 +340,56 @@
         </form>
         
         <script>
+            
+            const hints = document.querySelectorAll(".hint");
+        const lightThemeToggleBtn = document.querySelector('#lightToggleBtn');
         
         document.getElementById("showDescBtn").addEventListener('click', () => {
-            var hints = document.querySelectorAll(".hint");
             hints.forEach((e) => {
                 e.style.display = "block"; 
             })
         })
-
+        
+        lightThemeToggleBtn.addEventListener('click', function() {
+            const btnText = lightThemeToggleBtn.innerText
+            lightThemeToggleBtn.innerText = btnText == "Dark Theme" ? "Light Theme" : "Dark Theme";
+            document.body.classList.toggle('body-light');
+            hints.forEach((e) => {
+                e.classList.toggle("hint-light"); 
+            })
+        })
+        
         //Source: https://lengstorf.com/get-form-values-as-json/
         
         const isValidElement = element => {
             return element.name && element.value;
         };
-
+        
         const isValidValue = element => {
             return (!['checkbox'].includes(element.type) || element.checked);
         };
-
+        
         const formToJSON = elements => [].reduce.call(elements, (data, element) => {
-
+            
             // Make sure the element has the required properties and should be added.
             if (isValidElement(element) && isValidValue(element)) {
                 data[element.name] = element.value;
             }
             return data;
         }, {});
-
-        const handleFormSubmit = event => {
-
+        
+        const handleFormSubmit = event => {           
             // Stop the form from submitting since we’re handling that with AJAX.
             event.preventDefault();
-
+            
             // Call our function to get the form data.
             const data = formToJSON(form.elements);
-
+            
             // Use `JSON.stringify()` to make the output valid, human-readable JSON.
             var json_data = "json_str_begin" + JSON.stringify(data, null, "") + "json_str_end";
-
+            
             json_data.replace(/\\n/g, '');
-
+            
             var date = new Date();
             var now = 'time_begin'+date.getUTCFullYear()+':'+(date.getUTCMonth()+1)+':'+date.getUTCDate()+':'+date.getUTCHours()+":"+date.getUTCMinutes()+":"+date.getUTCSeconds()+'time_end';
             
@@ -379,9 +399,9 @@
             xhttp.send(json_data+now);
             
         };
-
+        
         const form = document.getElementsByClassName('config_form')[0];
         form.addEventListener('submit', handleFormSubmit);
         </script>
     </body>
-</html>
+    </html>
